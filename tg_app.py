@@ -2,16 +2,15 @@
 import os
 import sys
 
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.chrome.options import Options
+import chromedriver_binary
 import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
 
 data = pd.read_csv('content.csv', sep=';')
 url_list = data['url'].values
 price_list = data['price'].values
-
 
 result = {}
 already_posted = []
@@ -31,7 +30,7 @@ def parse_link(url_link, price_class):
     chrome_options.add_argument('--disable-dev-shm-usage')
 
     # driver = webdriver.Chrome('chromedriver.exe', options=chrome_options)
-    driver = webdriver.Chrome(os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+    driver = webdriver.Chrome(chromedriver_binary.chromedriver_filename, chrome_options=chrome_options)
 
     driver.get(url)
 
@@ -43,15 +42,16 @@ def parse_link(url_link, price_class):
 
     dropList.select_by_value('3')
 
-
     # price = driver.find_elements_by_class_name(str(price_class))
     price = WebDriverWait(driver, 5).until(lambda x: x.find_elements_by_class_name(price_class))
     name = WebDriverWait(driver, 5).until(lambda x: x.find_elements_by_class_name('card-title.h5'))
     if len(price) < 2:
         print("ERROR!!! on " + url_link, price_class)
         return
-    if float(price[0].get_attribute("innerText").split()[0]) * 1.3 <= float(price[1].get_attribute("innerText").split()[0]):
-        message = price[0].get_attribute("innerText") + " " + name[0].get_attribute("innerText") + " vs " + price[1].get_attribute("innerText") + " " + name[1].get_attribute("innerText") + " " + url_link
+    if float(price[0].get_attribute("innerText").split()[0]) * 1.3 <= float(
+            price[1].get_attribute("innerText").split()[0]):
+        message = price[0].get_attribute("innerText") + " " + name[0].get_attribute("innerText") + " vs " + price[
+            1].get_attribute("innerText") + " " + name[1].get_attribute("innerText") + " " + url_link
         message = str.replace(message, '#', ' ')
         # print(message)
         if message not in already_posted:

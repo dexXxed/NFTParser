@@ -3,7 +3,7 @@ import time
 
 import tg_app
 import tg_msg
-
+import chromedriver_binary
 
 while True:
     # start = time.time()
